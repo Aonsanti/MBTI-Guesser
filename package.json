@@ -1,4 +1,11 @@
 {
+  "name": "web-ai-project-root",
+  "version": "1.0.0",
+  "scripts": {
+    "frontend-install": "npm install --prefix Frontend",
+    "frontend-build": "npm run build --prefix Frontend",
+    "build": "npm run frontend-install && npm run frontend-build"
+  },
   "devDependencies": {
     "tailwindcss": "^4.2.1"
   },
