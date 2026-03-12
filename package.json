@@ -7,10 +7,10 @@
     "build": "npm run frontend-install && npm run frontend-build"
   },
   "devDependencies": {
-    "tailwindcss": "^4.2.1"
+    "tailwindcss": "latest"
   },
   "dependencies": {
-    "@tailwindcss/cli": "^4.2.1",
-    "@tailwindcss/vite": "^4.2.1"
+    "@tailwindcss/cli": "latest",
+    "@tailwindcss/vite": "latest"
   }
 }
