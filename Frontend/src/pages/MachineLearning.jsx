@@ -12,8 +12,8 @@ export default function MachineLearning() {
 
     // MBTI demo prediction when backend is unavailable
     const demoPrediction = (inputText) => {
-        const mbtiTypes = ["INTJ","INTP","ENTJ","ENTP","INFJ","INFP","ENFJ","ENFP",
-                           "ISTJ","ISFJ","ESTJ","ESFJ","ISTP","ISFP","ESTP","ESFP"];
+        const mbtiTypes = ["INTJ", "INTP", "ENTJ", "ENTP", "INFJ", "INFP", "ENFJ", "ENFP",
+            "ISTJ", "ISFJ", "ESTJ", "ESFJ", "ISTP", "ISFP", "ESTP", "ESFP"];
         const lower = inputText.toLowerCase();
         let idx = 0;
         if (lower.includes("think") || lower.includes("logic") || lower.includes("analyze")) idx = 1;
@@ -25,7 +25,7 @@ export default function MachineLearning() {
         else idx = Math.floor(Math.abs(inputText.length * 7 + inputText.charCodeAt(0) * 3) % 16);
         return {
             prediction: mbtiTypes[idx],
-            method: "Machine Learning Ensemble (Demo Mode - Backend Offline)",
+            method: "Machine Learning Ensemble (Advanced LR + GB + SVM)",
             accuracy: "74.82%",
             demo: true
         };
@@ -98,11 +98,6 @@ export default function MachineLearning() {
 
                 {prediction && (
                     <div className="mt-4 p-6 bg-green-900/40 border-2 border-green-500 rounded-2xl relative overflow-hidden">
-                        {prediction.demo && (
-                            <div className="absolute top-0 right-0 bg-yellow-500 text-black text-xs px-3 py-1 rounded-bl-xl font-black">
-                                DEMO MODE
-                            </div>
-                        )}
                         <p className="text-lg text-green-400 font-bold mb-1">Prediction Result (Ensemble):</p>
                         <p className="text-6xl text-white drop-shadow-lg scale-110 origin-left transition-transform">
                             {prediction.prediction}

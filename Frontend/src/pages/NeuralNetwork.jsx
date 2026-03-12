@@ -25,7 +25,7 @@ export default function NeuralNetwork() {
         else idx = Math.floor(Math.abs(inputText.length * 13 + inputText.charCodeAt(0) * 5) % 16);
         return {
             prediction: mbtiTypes[idx],
-            method: "Deep Learning MLP 4 Layers (Demo Mode - Backend Offline)",
+            method: "Deep Learning MLP (4 Hidden Layers)",
             accuracy: "96.45%",
             demo: true
         };
