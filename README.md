@@ -65,4 +65,3 @@ npm run dev
 ```
 
 ---
-*Created for Academic Excellence in AI & Machine Learning Research.*
