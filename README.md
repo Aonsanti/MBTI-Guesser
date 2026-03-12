@@ -1,6 +1,6 @@
-# Personality AI Lab: MBTI Prediction System
+# Personality AI : MBTI Prediction System
 
-A professional academic research project that leverages **Machine Learning** and **Deep Learning** to predict Myers-Briggs Type Indicator (MBTI) personality types from text input.
+Intelligent System Project that use **Machine Learning** and **Neural Network (Deep Learning)** to predict Myers-Briggs Type Indicator (MBTI) personality types from text input.
 
 ## Project Overview
 
@@ -65,4 +65,3 @@ npm run dev
 ```
 
 ---
-*Created for Academic Excellence in AI & Machine Learning Research.*
