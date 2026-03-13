@@ -4,15 +4,17 @@ from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 
 # Ensure nltk resources are available
-try:
-    nltk.data.find('corpora/stopwords')
-except LookupError:
-    nltk.download('stopwords')
-try:
-    nltk.data.find('corpora/wordnet')
-except LookupError:
-    nltk.download('wordnet')
+def initialize_nltk():
+    try:
+        nltk.data.find('corpora/stopwords')
+    except (LookupError, AttributeError):
+        nltk.download('stopwords')
+    try:
+        nltk.data.find('corpora/wordnet')
+    except (LookupError, AttributeError):
+        nltk.download('wordnet')
 
+initialize_nltk()
 lemmatizer = WordNetLemmatizer()
 stop_words = set(stopwords.words('english'))
 
@@ -40,12 +42,3 @@ def preprocess_mbti_data(df):
     df['clean_posts'] = df['posts'].apply(clean_text)
     return df
 
-def preprocess_student_data(df):
-    # Handling imperfections: Missing values
-    # Fill missing scores with mean or 0
-    df['midterm_score'] = df['midterm_score'].fillna(df['midterm_score'].mean())
-    df['final_score'] = df['final_score'].fillna(df['final_score'].mean())
-    df['attendance'] = df['attendance'].fillna(0)
-    # Remove duplicates
-    df = df.drop_duplicates()
-    return df

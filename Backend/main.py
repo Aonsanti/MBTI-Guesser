@@ -23,7 +23,10 @@ app.add_middleware(
 )
 
 # Load Models
-models_path = '../Models/'
+# Use absolute path to ensure models are loaded correctly regardless of where the app is started
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+models_path = os.path.join(BASE_DIR, '..', 'Models')
+
 ml_model = None
 ml_vec = None
 nn_model = None
@@ -32,13 +35,22 @@ nn_vec = None
 def load_models():
     global ml_model, ml_vec, nn_model, nn_vec
     try:
-        if os.path.exists(models_path + 'ml_ensemble.pkl'):
-            ml_model = joblib.load(models_path + 'ml_ensemble.pkl')
-            ml_vec = joblib.load(models_path + 'ml_vectorizer.pkl')
-        if os.path.exists(models_path + 'nn_model.pkl'):
-            nn_model = joblib.load(models_path + 'nn_model.pkl')
-            nn_vec = joblib.load(models_path + 'nn_vectorizer.pkl')
-        print("Models loaded successfully.")
+        ml_model_file = os.path.join(models_path, 'ml_ensemble.pkl')
+        ml_vec_file = os.path.join(models_path, 'ml_vectorizer.pkl')
+        nn_model_file = os.path.join(models_path, 'nn_model.pkl')
+        nn_vec_file = os.path.join(models_path, 'nn_vectorizer.pkl')
+
+        if os.path.exists(ml_model_file):
+            ml_model = joblib.load(ml_model_file)
+            ml_vec = joblib.load(ml_vec_file)
+        if os.path.exists(nn_model_file):
+            nn_model = joblib.load(nn_model_file)
+            nn_vec = joblib.load(nn_vec_file)
+        
+        if ml_model and nn_model:
+            print(f"Models loaded successfully from {models_path}")
+        else:
+            print(f"Warning: Some models were not found in {models_path}")
     except Exception as e:
         print(f"Error loading models: {e}")
 
@@ -91,13 +103,6 @@ def get_dataset_info():
                 "features": "Type (16 MBTI types), Posts (Last 50 posts per user)",
                 "imperfections": "Unstructured text, URLs included, HTML tags, special characters.",
                 "preparation": "Text cleaning: lowercasing, removing URLs/punctuation, lemmatization, stopword removal."
-            },
-            {
-                "name": "Student Performance (Simulated)",
-                "source": "Created for demonstration",
-                "features": "Attendance, Midterm Score, Final Score, Grade",
-                "imperfections": "Missing values in scores/attendance, Duplicate rows (e.g., student Frank).",
-                "preparation": "Handling missing data (mean imputation), deduplication."
             }
         ]
     }

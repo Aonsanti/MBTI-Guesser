@@ -38,13 +38,6 @@ export default function NeuralNetwork() {
             features: "Type (16 MBTI types), Posts (Last 50 posts per user)",
             imperfections: "Unstructured text, URLs included, HTML tags, special characters.",
             preparation: "Text cleaning: lowercasing, removing URLs/punctuation, lemmatization, stopword removal."
-        },
-        {
-            name: "Student Performance (Simulated)",
-            source: "Created for demonstration",
-            features: "Attendance, Midterm Score, Final Score, Grade",
-            imperfections: "Missing values in scores/attendance, Duplicate rows (e.g., student Frank).",
-            preparation: "Handling missing data (mean imputation), deduplication."
         }
     ];
 
