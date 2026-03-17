@@ -1,4 +1,4 @@
-# Personality AI : MBTI Prediction System
+# MBTI Guesser - MBTI Prediction System
 
 Intelligent System Project that use **Machine Learning** and **Neural Network (Deep Learning)** to predict Myers-Briggs Type Indicator (MBTI) personality types from text input.
 
