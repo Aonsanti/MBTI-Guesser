@@ -10,8 +10,6 @@ A state-of-the-art intelligent system designed to analyze and predict human pers
 
 ---
 
-## <img src="https://img.icons8.com/isometric/40/rocket.png" width="22" /> Key Features
-
 - **MBTI Personality Guesser**: A deep 4-layer Multi-Layer Perceptron (MLP) trained to classify writing styles into 16 Myers-Briggs types with **96% accuracy**.
 - **Sentiment Insight**: A cross-validated Ensemble model (Logistic Regression + SGD + MultinomialNB) for analyzing positive/negative sentiment in movie reviews.
 - **VADER Hybrid Override**: Integrated Lexicon-based sentiment analysis to handle short-form profanity, aggressive intent, and complex negations (e.g., "not bad").
@@ -19,8 +17,6 @@ A state-of-the-art intelligent system designed to analyze and predict human pers
 - **Dockerized Infrastructure**: Single-command deployment for both Frontend and Backend environments.
 
 ---
-
-## <img src="https://img.icons8.com/isometric/40/line-chart.png" width="22" /> Performance Benchmarks
 
 The project meets and exceeds all training requirements:
 
@@ -48,15 +44,11 @@ The project meets and exceeds all training requirements:
 
 ---
 
-## <img src="https://img.icons8.com/isometric/40/box.png" width="22" /> Dataset Information
-
 - **MBTI Dataset**: 8.6k rows of classified text posts from various personality types.
 - **IMDB Sentiment**: 50,000 highly polar movie reviews for sentiment benchmarking.
 - **Preprocessing**: Automatic cleaning including URL removal, MBTI mention stripping (leakage prevention), lemmatization, and HTML cleaning.
 
 ---
-
-## <img src="https://img.icons8.com/isometric/40/docker.png" width="22" /> How to Run (Docker - Recommended)
 
 To start the entire ecosystem in one go, ensure you have **Docker Desktop** installed and run:
 
