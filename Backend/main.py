@@ -17,9 +17,13 @@ if nltk_data_dir not in nltk.data.path:
     nltk.data.path.append(nltk_data_dir)
 
 try:
+    # Try finding it in the standard path or the tmp path
     nltk.data.find('sentiment/vader_lexicon.zip')
 except LookupError:
-    nltk.download('vader_lexicon', download_dir=nltk_data_dir)
+    try:
+        nltk.data.find('vader_lexicon')
+    except LookupError:
+        nltk.download('vader_lexicon', download_dir=nltk_data_dir)
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from preprocess import clean_text_imdb, clean_text_mbti
 from models_def import MBTINet, PyTorchSklearnWrapper

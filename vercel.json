@@ -1,17 +1,17 @@
 {
+  "functions": {
+    "api/*.py": {
+      "includeFiles": "Models/**"
+    }
+  },
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/Backend/main.py"
+      "destination": "/api/index.py"
     },
     {
       "source": "/(.*)",
       "destination": "/Frontend/dist/$1"
     }
-  ],
-  "functions": {
-    "Backend/main.py": {
-      "includeFiles": "Models/**"
-    }
-  }
+  ]
 }
