@@ -116,9 +116,9 @@ export default function MachineLearning() {
                                 {prediction.prediction}
                             </p>
                             <div className="text-[10px] md:text-sm text-green-300 mt-4 leading-relaxed">
-                                <span className="text-red-400 font-bold">Neg: {prediction.prob_negative}%</span> 
-                                <span className="text-gray-400 mx-1 md:mx-2">|</span> 
-                                <span className="text-blue-400 font-bold">Pos: {prediction.prob_positive}%</span> 
+                                <span className="text-red-400 font-bold">Neg: {prediction.prob_negative}%</span>
+                                <span className="text-gray-400 mx-1 md:mx-2">|</span>
+                                <span className="text-blue-400 font-bold">Pos: {prediction.prob_positive}%</span>
                                 <span className="text-gray-400 mx-1 md:mx-2 block md:inline mt-1 md:mt-0"></span>
                                 Words Analyzed: {text.trim().split(/\s+/).filter(w => w.length > 0).length}
                             </div>
@@ -142,23 +142,23 @@ export default function MachineLearning() {
             {/* --- Accuracy Reporting --- */}
             <div className="mt-12 w-full max-w-4xl">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-gray-800 p-6 rounded-2xl border-t-4 border-green-500 shadow-lg text-center">
-                    <p className="text-gray-400 text-xs uppercase tracking-widest mb-2 font-black">Ensemble Accuracy</p>
-                    <p className="text-5xl text-white font-black">90.21%</p>
-                    <p className="text-green-500 text-xs mt-2 italic font-normal">3 Models Combined</p>
+                    <div className="bg-gray-800 p-6 rounded-2xl border-t-4 border-green-500 shadow-lg text-center">
+                        <p className="text-gray-400 text-xs uppercase tracking-widest mb-2 font-black">Ensemble Accuracy</p>
+                        <p className="text-5xl text-white font-black">90.21%</p>
+                        <p className="text-green-500 text-xs mt-2 italic font-normal">3 Models Combined</p>
+                    </div>
+                    <div className="bg-gray-800 p-6 rounded-2xl border-t-4 border-green-500 shadow-lg text-center">
+                        <p className="text-gray-400 text-xs uppercase tracking-widest mb-2 font-black">Voting Method</p>
+                        <p className="text-5xl text-white font-black">Soft</p>
+                        <p className="text-green-500 text-xs mt-2 italic font-normal">Probability-Based Voting</p>
+                    </div>
+                    <div className="bg-gray-800 p-6 rounded-2xl border-t-4 border-green-500 shadow-lg text-center">
+                        <p className="text-gray-400 text-xs uppercase tracking-widest mb-2 font-black">Dataset Size</p>
+                        <p className="text-5xl text-white font-black">50K</p>
+                        <p className="text-green-500 text-xs mt-2 italic font-normal">IMDB Movie Reviews</p>
+                    </div>
                 </div>
-                <div className="bg-gray-800 p-6 rounded-2xl border-t-4 border-green-500 shadow-lg text-center">
-                    <p className="text-gray-400 text-xs uppercase tracking-widest mb-2 font-black">Voting Method</p>
-                    <p className="text-5xl text-white font-black">Soft</p>
-                    <p className="text-green-500 text-xs mt-2 italic font-normal">Probability-Based Voting</p>
-                </div>
-                <div className="bg-gray-800 p-6 rounded-2xl border-t-4 border-green-500 shadow-lg text-center">
-                    <p className="text-gray-400 text-xs uppercase tracking-widest mb-2 font-black">Dataset Size</p>
-                    <p className="text-5xl text-white font-black">50K</p>
-                    <p className="text-green-500 text-xs mt-2 italic font-normal">IMDB Movie Reviews</p>
-                </div>
-                </div>
-                
+
                 <div className="mt-8 bg-gray-800 p-6 rounded-2xl border border-green-500/30 shadow-lg text-center flex flex-col items-center">
                     <p className="text-gray-400 text-xs uppercase tracking-widest mb-4 font-black">Model Performance Comparison Graph</p>
                     <img src="/ml_graph.png" alt="ML Models Accuracy Comparison" className="w-full max-w-3xl rounded-xl shadow-2xl bg-gray-900 border border-gray-700" />

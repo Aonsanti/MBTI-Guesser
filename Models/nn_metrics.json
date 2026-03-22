@@ -1,0 +1,6 @@
+{
+  "accuracy": 29.71,
+  "training_time": 264.8,
+  "device": "cpu",
+  "architecture": "PyTorch Deep MLP (GPU)"
+}

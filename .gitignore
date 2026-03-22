@@ -35,10 +35,8 @@ venv/
 ENV/
 
 # Project Specific
-Models/*.pkl
-Models/*.json
-Dataset/*.csv
-Dataset/*.zip
+# Models/
+# Dataset/
 webai_hero_banner.png
 
 # IDEs

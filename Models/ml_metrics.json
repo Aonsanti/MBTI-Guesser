@@ -1,0 +1,10 @@
+{
+  "accuracy": 90.54,
+  "method": "Ensemble (LR + SGD + NB)",
+  "training_time": 30.6,
+  "individual_models": {
+    "Logistic Regression": 89.97,
+    "SGD (Modified Huber)": 90.1,
+    "Multinomial NB": 87.71
+  }
+}
