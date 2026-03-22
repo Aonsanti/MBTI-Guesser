@@ -6,7 +6,7 @@ export default function Header() {
                     <h1 className="flex-1 text-center text-xl md:text-3xl lg:text-4xl duration-300 font-bold px-4">
                         Machine Learning & Neural Network
                     </h1>
-                    <a href="https://github.com/Aonsanti/MBTI-and-Sentiment-Prediction" target="_blank" className="hover:opacity-75 transition-opacity shrink-0">
+                    <a href="https://github.com/Aonsanti/MBTI-and-Sentiment-Prediction" target="_blank" rel="noopener noreferrer">
                         <img src="/github-white-icon.webp" alt="GitHub" className="w-8 h-8 md:w-12 md:h-12" />
                     </a>
                 </div>

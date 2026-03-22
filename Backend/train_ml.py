@@ -8,11 +8,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.ensemble import VotingClassifier
 from sklearn.linear_model import LogisticRegression, SGDClassifier
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import LabelEncoder
 from sklearn.naive_bayes import MultinomialNB
 from preprocess import clean_text_imdb, preprocess_imdb_data
-
 
 def train_ml():
     start_time = time.time()
@@ -20,7 +19,6 @@ def train_ml():
     print("  IMDB Sentiment Analysis - Fast 3-Model Ensemble")
     print("=" * 60)
 
-    # ── 1. Load & Preprocess (cached) ────────────────────────────
     models_dir = '../Models'
     if not os.path.exists(models_dir):
         os.makedirs(models_dir)
@@ -38,7 +36,6 @@ def train_ml():
     X = df['clean_review']
     y = df['label']
 
-    # ── 2. TF-IDF Vectorization (cached) ─────────────────────────
     tfidf_cache = os.path.join(models_dir, 'imdb_tfidf_cache.pkl')
     if os.path.exists(tfidf_cache):
         print("[+] Loading TF-IDF vectors from cache...")
@@ -48,11 +45,11 @@ def train_ml():
     else:
         print("[*] Building TF-IDF vectors...")
         vectorizer = TfidfVectorizer(
-            max_features=50000,       # More features for better accuracy
-            ngram_range=(1, 3),       # Unigrams, bigrams, and trigrams
-            min_df=3,                 # Remove rare terms (noise reduction)
-            max_df=0.90,              # Remove too-common terms
-            sublinear_tf=True,        # log(1+tf) scaling — proven better for text
+            max_features=50000,
+            ngram_range=(1, 3),
+            min_df=3,
+            max_df=0.90,
+            sublinear_tf=True,
         )
         X_vec = vectorizer.fit_transform(X)
         joblib.dump({'X_vec': X_vec, 'vectorizer': vectorizer}, tfidf_cache)
@@ -63,35 +60,25 @@ def train_ml():
         X_vec, y, test_size=0.15, random_state=42, stratify=y
     )
 
-    # ── 3. Define 3-Model Ensemble ───────────────────────────────
     print("\n" + "-" * 60)
     print("  Training 3-Model Ensemble")
     print("-" * 60)
 
-    # Model 1: Logistic Regression (fast & excellent for sparse TF-IDF)
     clf_lr = LogisticRegression(
         C=10, max_iter=1000, solver='lbfgs', random_state=42
     )
 
-    # Model 2: SGDClassifier with modified_huber loss
-    # Much faster than LinearSVC+CalibratedClassifierCV
-    # modified_huber natively supports predict_proba for soft voting
-    # Same decision boundary quality as SVM
     clf_sgd = SGDClassifier(
-        loss='modified_huber',        # SVM-like + native probability support
-        alpha=1e-4,                   # Regularization (~ C=10000)
-        max_iter=100,                 # Converges fast on TF-IDF
+        loss='modified_huber',
+        alpha=1e-4,
+        max_iter=100,
         tol=1e-3,
         random_state=43,
         n_jobs=-1,
     )
 
-    # Model 3: Multinomial Naive Bayes
-    # Lightning fast, natively designed for text counts/TF-IDF distribution
-    # Synergizes incredibly well with linear models in ensembles
     clf_nb = MultinomialNB(alpha=0.1)
 
-    # ── 4. Train each model individually (with timing) ───────────
     models = {
         'Logistic Regression': clf_lr,
         'SGD (Modified Huber)': clf_sgd,
@@ -117,7 +104,6 @@ def train_ml():
         trained_models[name] = clf
         print(f"done in {elapsed_model:.1f}s  ->  {acc_i*100:.2f}%")
 
-    # ── 5. Build Soft Voting Ensemble from trained models ────────
     print(f"\n  -> Building Soft Voting Ensemble...", end=" ", flush=True)
     ensemble = VotingClassifier(
         estimators=[
@@ -128,19 +114,16 @@ def train_ml():
         voting='soft',
     )
 
-    # Skip refitting — inject already-trained estimators directly
     ensemble.estimators_ = [
         trained_models['Logistic Regression'],
         trained_models['SGD (Modified Huber)'],
         trained_models['Multinomial NB'],
     ]
 
-    
     ensemble.le_ = LabelEncoder().fit(y_train)
     ensemble.classes_ = ensemble.le_.classes_
     print("done")
 
-    # ── 6. Evaluate Ensemble ─────────────────────────────────────
     y_pred = ensemble.predict(X_test)
     accuracy = accuracy_score(y_test, y_pred)
     elapsed = time.time() - start_time
@@ -153,11 +136,6 @@ def train_ml():
     print(f"  {'Ensemble (Soft Voting)':.<35} {accuracy*100:.2f}%")
     print(f"\n  Total Training Time: {elapsed:.1f}s")
     print("=" * 60)
-
-    # ── 7. Save and Move ──────────────────────────────────────────
-    models_dir = '../Models'
-    if not os.path.exists(models_dir):
-        os.makedirs(models_dir)
 
     print("\n[+] Saving model locally...")
     joblib.dump(ensemble, 'ml_model.pkl')
@@ -179,7 +157,6 @@ def train_ml():
         json.dump(metrics, f, indent=2)
 
     print(f"[+] Model and metrics moved to {models_dir}/")
-
 
 if __name__ == "__main__":
     train_ml()

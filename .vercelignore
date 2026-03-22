@@ -1,5 +1,6 @@
 .git/
 .vscode/
+Dataset/
 # Keep Dataset for user request, but minimize Models folder
 Models/imdb_cleaned.pkl
 Models/imdb_tfidf_cache.pkl

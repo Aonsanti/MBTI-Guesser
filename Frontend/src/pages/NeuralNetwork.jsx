@@ -1,74 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useModel } from "../hooks/useModel";
 
 export default function NeuralNetwork() {
     const [text, setText] = useState("");
-    const [prediction, setPrediction] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [datasets, setDatasets] = useState([]);
-    const [error, setError] = useState(null);
+    const { prediction, loading, datasetInfo, error, predict } = useModel("nn");
 
-    const API_URL = import.meta.env.DEV ? "http://localhost:8000/api" : "/api";
+    const datasets = datasetInfo ? [datasetInfo] : [];
 
-    // MBTI demo prediction when backend is unavailable
-    const demoPrediction = (inputText) => {
-        const mbtiTypes = ["INTJ", "INTP", "ENTJ", "ENTP", "INFJ", "INFP", "ENFJ", "ENFP",
-            "ISTJ", "ISFJ", "ESTJ", "ESFJ", "ISTP", "ISFP", "ESTP", "ESFP"];
-        const lower = inputText.toLowerCase();
-        let idx = 0;
-        if (lower.includes("think") || lower.includes("logic") || lower.includes("analyze")) idx = 1;
-        else if (lower.includes("lead") || lower.includes("plan") || lower.includes("manage")) idx = 0;
-        else if (lower.includes("feel") || lower.includes("heart") || lower.includes("care")) idx = 5;
-        else if (lower.includes("social") || lower.includes("party") || lower.includes("friend")) idx = 7;
-        else if (lower.includes("creative") || lower.includes("art") || lower.includes("imagine")) idx = 4;
-        else if (lower.includes("explore") || lower.includes("adventure") || lower.includes("travel")) idx = 3;
-        else idx = Math.floor(Math.abs(inputText.length * 13 + inputText.charCodeAt(0) * 5) % 16);
-        return {
-            prediction: mbtiTypes[idx],
-            method: "Deep Learning MLP (4 Hidden Layers, 1024-512-256-128)",
-            accuracy: "96.45%",
-            demo: true
-        };
-    };
-
-    const fallbackDatasets = [
-        {
-            name: "MBTI Myers-Briggs Type Indicator",
-            source: "Kaggle (mbti_1.csv)",
-            features: "Type (16 MBTI types), Posts (Last 50 posts per user)",
-            imperfections: "Unstructured text, URLs included, HTML tags, special characters, MBTI type mentions in text (data leakage).",
-            preparation: "Text cleaning: lowercasing, removing URLs/punctuation, MBTI type removal, lemmatization, stopword removal, TF-IDF vectorization with trigrams."
-        }
-    ];
-
-    useEffect(() => {
-        fetch(API_URL + "/dataset-info")
-            .then(res => res.json())
-            .then(data => setDatasets([data.nn_dataset]))
-            .catch(() => setDatasets(fallbackDatasets));
-    }, []);
-
-    const handlePredict = async () => {
+    const handlePredict = () => {
         if (!text) return;
-        setLoading(true);
-        setError(null);
-        setPrediction(null);
-        try {
-            const res = await fetch(API_URL + "/predict/nn", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ text })
-            });
-            if (!res.ok) throw new Error("Server error: " + res.status);
-            const data = await res.json();
-            setPrediction(data);
-        } catch (err) {
-            console.error(err);
-            // Fallback to demo mode
-            setPrediction(demoPrediction(text));
-        } finally {
-            setLoading(false);
-        }
+        predict(text);
     };
 
     return (
@@ -118,7 +60,6 @@ export default function NeuralNetwork() {
                 )}
             </div>
 
-            {/* --- Deep Learning Performance --- */}
             <div className="mt-12 w-full max-w-5xl">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-gray-800 p-6 rounded-2xl border-t-4 border-sky-500 shadow-lg text-center">
@@ -137,14 +78,13 @@ export default function NeuralNetwork() {
                     <p className="text-sky-500 text-xs mt-2 italic font-normal">MBTI Personality Types</p>
                 </div>
                 </div>
-                
+
                 <div className="mt-8 bg-gray-800 p-6 rounded-2xl border border-sky-500/30 shadow-lg text-center flex flex-col items-center">
                     <p className="text-gray-400 text-xs uppercase tracking-widest mb-4 font-black">Neural Network Training Loss Curve (Cross Entropy)</p>
                     <img src="/nn_graph.png" alt="Neural Network Loss Curve" className="w-full max-w-3xl rounded-xl shadow-2xl bg-gray-900 border border-gray-700" />
                 </div>
             </div>
 
-            {/* --- Section: How it Works --- */}
             <div className="mt-20 w-full max-w-5xl bg-gray-800 p-10 rounded-3xl border border-sky-500/20 shadow-2xl">
                 <h2 className="text-3xl text-sky-500 mb-8 flex items-center gap-3">
                     <span className="bg-sky-500 text-black px-3 py-1 rounded-lg text-xl">2</span>
@@ -202,8 +142,8 @@ model.fit(X_train, y_train)`}
     for t in ['infj','entp','intp','intj',...]:
         text = text.replace(t, '')
     # 5. Lemmatize & remove stopwords
-    words = [lemmatizer.lemmatize(word) 
-             for word in text.split() 
+    words = [lemmatizer.lemmatize(word)
+             for word in text.split()
              if word not in stop_words and len(word) > 2]
     return " ".join(words)`}
                         </pre>
@@ -227,7 +167,6 @@ model.fit(X_train, y_train)`}
                 </div>
             </div>
 
-            {/* --- Data Summary Section --- */}
             <div className="mt-20 w-full max-w-5xl flex flex-col gap-10 mb-20">
                 <h2 className="text-3xl text-center text-sky-400">Data Details & References</h2>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

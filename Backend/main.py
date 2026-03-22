@@ -9,9 +9,8 @@ import nltk
 import tempfile
 from functools import lru_cache
 
-# Ensure current directory and root is in search path to find local modules
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-# Models are usually in a directory relative to the project root
+
 ROOT_DIR = os.path.dirname(BASE_DIR)
 MODELS_PATH = os.path.join(ROOT_DIR, 'Models')
 
@@ -23,24 +22,21 @@ from models_def import NumpySklearnWrapper
 
 app = FastAPI(title="Sentiment and MBTI Prediction API")
 
-# Allow CORS for React frontend (useful for local dev and specific origins)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # In Vercel, we can restrict this further if needed
+    allow_origins=["*"],
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# === Helper: Initialize NLTK safely for Serverless ===
 @lru_cache(None)
 def setup_nltk():
     nltk_data_dir = os.path.join(tempfile.gettempdir(), 'nltk_data')
     os.makedirs(nltk_data_dir, exist_ok=True)
     if nltk_data_dir not in nltk.data.path:
         nltk.data.path.append(nltk_data_dir)
-    
-    # Pre-download VADER lexicon if missing
+
     try:
         nltk.data.find('sentiment/vader_lexicon.zip')
     except LookupError:
@@ -48,11 +44,10 @@ def setup_nltk():
             nltk.data.find('vader_lexicon')
         except LookupError:
             nltk.download('vader_lexicon', download_dir=nltk_data_dir)
-    
+
     from nltk.sentiment.vader import SentimentIntensityAnalyzer
     return SentimentIntensityAnalyzer()
 
-# === Lazy Model Loading ===
 class ModelCache:
     ml_model = None
     ml_vec = None
@@ -108,31 +103,26 @@ class TextInput(BaseModel):
 def read_root():
     return {"message": "Serverless ML (IMDB) & NN (MBTI) Prediction API is running"}
 
-# ==================== ML: IMDB Sentiment Analysis ====================
-
 @app.post("/api/predict/ml")
 async def predict_ml(input_data: TextInput):
     try:
         model, vec = ModelCache.get_ml_model()
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Model loading error: {str(e)}")
-    
+
     cleaned = clean_text_imdb(input_data.text)
     transformed = vec.transform([cleaned])
     prediction = model.predict(transformed)[0]
-    
-    # Get probability scores
+
     proba = model.predict_proba(transformed)[0]
     prob_negative = float(proba[0]) * 100
     prob_positive = float(proba[1]) * 100
-    
+
     sentiment = "Positive" if prediction == 1 else "Negative"
     method_used = "Ensemble (LR + SGD + NB)"
-    
-    # Initialize VADER (lazy load)
+
     sia = setup_nltk()
-    
-    # Lexicon-based override for short texts
+
     words_count = len(input_data.text.split())
     if words_count < 20:
         comp = sia.polarity_scores(input_data.text)['compound']
@@ -146,7 +136,7 @@ async def predict_ml(input_data: TextInput):
             method_used = "Ensemble + VADER Lexicon Override"
             prob_positive = max(prob_positive, comp * 100)
             prob_negative = 100 - prob_positive
-            
+
     ml_metrics = ModelCache.get_metrics('ml')
     return {
         "prediction": sentiment,
@@ -156,18 +146,16 @@ async def predict_ml(input_data: TextInput):
         "accuracy": f"{ml_metrics['accuracy']}%" if ml_metrics else "N/A"
     }
 
-# ==================== NN: MBTI Personality Prediction ====================
-
 @app.post("/api/predict/nn")
 async def predict_nn(input_data: TextInput):
     try:
         model = ModelCache.get_nn_model()
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Model loading error: {str(e)}")
-    
+
     cleaned = clean_text_mbti(input_data.text)
     prediction = model.predict([cleaned])[0]
-    
+
     nn_metrics = ModelCache.get_metrics('nn')
     return {
         "prediction": prediction,

@@ -1,44 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useModel } from "../hooks/useModel";
 
 export default function MachineLearning() {
     const [text, setText] = useState("");
-    const [prediction, setPrediction] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [datasetInfo, setDatasetInfo] = useState(null);
-    const [error, setError] = useState(null);
-
-    const API_URL = import.meta.env.DEV ? "http://localhost:8000/api" : "/api";
-
-    // Sentiment demo prediction when backend is unavailable
-    const demoPrediction = (inputText) => {
-        const lower = inputText.toLowerCase();
-
-        // Manual override rules to perfectly simulate backend VADER Lexicon processing
-        if (lower.includes("not bad")) return { prediction: "Positive", method: "Demo (+VADER simulation)", demo: true, prob_positive: 85, prob_negative: 15 };
-        if (lower.match(/fuck|kill|die|shit|bitch|crap/)) return { prediction: "Negative", method: "Demo (+VADER simulation)", demo: true, prob_positive: 10, prob_negative: 90 };
-
-        const positiveWords = ["good", "great", "love", "amazing", "excellent", "best", "wonderful", "fantastic", "enjoy", "beautiful", "brilliant", "awesome", "perfect", "recommend", "nice"];
-        const negativeWords = ["bad", "terrible", "hate", "worst", "awful", "boring", "waste", "poor", "horrible", "disappointing", "stupid", "ugly", "annoying", "dull"];
-
-        let posCount = 0, negCount = 0;
-        positiveWords.forEach(w => { if (lower.includes(w)) posCount++; });
-        negativeWords.forEach(w => { if (lower.includes(w)) negCount++; });
-
-        const sentiment = posCount > negCount ? "Positive" : (negCount > posCount ? "Negative" : "Positive");
-
-        let prob_positive = sentiment === "Positive" ? Math.min(50 + (posCount * 12), 99) : Math.max(10 - (negCount * 2), 1);
-        let prob_negative = 100 - prob_positive;
-
-        return {
-            prediction: sentiment,
-            prob_positive: prob_positive,
-            prob_negative: prob_negative,
-            method: "ML Ensemble (Logistic Regression + SGD + MultinomialNB)",
-            accuracy: "90.21%",
-            demo: true
-        };
-    };
+    const { prediction, loading, datasetInfo, error, predict } = useModel("ml");
 
     const fallbackDatasetInfo = {
         name: "IMDB Dataset of 50K Movie Reviews",
@@ -48,34 +14,9 @@ export default function MachineLearning() {
         preparation: "HTML tag removal (BeautifulSoup), URL removal, special character removal, lowercasing, lemmatization (WordNet), stopword removal, TF-IDF vectorization."
     };
 
-    useEffect(() => {
-        fetch(API_URL + "/dataset-info")
-            .then(res => res.json())
-            .then(data => setDatasetInfo(data.ml_dataset))
-            .catch(() => setDatasetInfo(fallbackDatasetInfo));
-    }, []);
-
-    const handlePredict = async () => {
+    const handlePredict = () => {
         if (!text) return;
-        setLoading(true);
-        setError(null);
-        setPrediction(null);
-        try {
-            const res = await fetch(API_URL + "/predict/ml", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ text })
-            });
-            if (!res.ok) throw new Error("Server error: " + res.status);
-            const data = await res.json();
-            setPrediction(data);
-        } catch (err) {
-            console.error(err);
-            // Fallback to demo mode
-            setPrediction(demoPrediction(text));
-        } finally {
-            setLoading(false);
-        }
+        predict(text);
     };
 
     return (
@@ -139,7 +80,6 @@ export default function MachineLearning() {
                 )}
             </div>
 
-            {/* --- Accuracy Reporting --- */}
             <div className="mt-12 w-full max-w-4xl">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="bg-gray-800 p-6 rounded-2xl border-t-4 border-green-500 shadow-lg text-center">
@@ -165,7 +105,6 @@ export default function MachineLearning() {
                 </div>
             </div>
 
-            {/* --- Section: How it Works --- */}
             <div className="mt-8 md:mt-20 w-full max-w-4xl bg-gray-800 p-6 md:p-10 rounded-2xl md:rounded-3xl border border-green-500/20 shadow-2xl">
                 <h2 className="text-xl md:text-3xl text-green-500 mb-6 md:mb-8 flex items-center gap-3">
                     <span className="bg-green-500 text-black px-3 py-1 rounded-lg text-lg md:text-xl">1</span>
@@ -226,8 +165,8 @@ ensemble.fit(X_train, y_train)`}
     text = text.lower()
     # 5. Lemmatize & remove stopwords
     words = text.split()
-    words = [lemmatizer.lemmatize(word) 
-             for word in words 
+    words = [lemmatizer.lemmatize(word)
+             for word in words
              if word not in stop_words and len(word) > 2]
     return " ".join(words)`}
                         </pre>
@@ -246,7 +185,6 @@ ensemble.fit(X_train, y_train)`}
                 </div>
             </div>
 
-            {/* --- Dataset Info --- */}
             {datasetInfo && (
                 <div className="mt-10 w-full max-w-4xl bg-gray-600/10 p-10 rounded-3xl border border-gray-500/30 mb-20">
                     <h2 className="text-3xl text-white mb-8">Data Details & References</h2>
@@ -264,7 +202,7 @@ ensemble.fit(X_train, y_train)`}
 
                             <p className="text-blue-400 font-bold mb-2 uppercase tracking-widest text-xs">References</p>
                             <p className="font-normal text-sky-400 underline italic">
-                                <a href="https://www.kaggle.com/code/lakshmi25npathi/sentiment-analysis-of-imdb-movie-reviews" target="_blank" rel="noreferrer">
+                                <a href="https://www.kaggle.com/datasets/lakshmi25npathi/imdb-dataset-of-50k-movie-reviews" target="_blank" rel="noreferrer">
                                     Kaggle: Sentiment Analysis of IMDB Movie Reviews
                                 </a>
                             </p>
