@@ -3,6 +3,12 @@ from pydantic import BaseModel
 import joblib
 import json
 import os
+import sys
+
+# Ensure current directory is in search path to find local modules (preprocess, models_def)
+current_dir = os.path.dirname(os.path.abspath(__file__))
+if current_dir not in sys.path:
+    sys.path.append(current_dir)
 import nltk
 import tempfile
 nltk_data_dir = os.path.join(tempfile.gettempdir(), 'nltk_data')
