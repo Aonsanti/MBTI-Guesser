@@ -1,4 +1,6 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import joblib
 import json
@@ -200,6 +202,35 @@ def get_dataset_info():
         }
     }
 
+# ==================== Serve Static Frontend (Vite) ====================
+# This allows the backend to serve the frontend on the same port (for Render/Heroku/etc.)
+# Construct the path to the 'public' directory (renamed from 'dist')
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+public_path = os.path.join(ROOT_DIR, 'public')
+
+# Serve static files (/assets etc.)
+if os.path.exists(public_path):
+    app.mount("/assets", StaticFiles(directory=os.path.join(public_path, "assets")), name="assets")
+
+    @app.get("/{full_path:path}")
+    async def serve_spa(request: Request, full_path: str):
+        # Don't catch /api routes
+        if full_path.startswith("api/"):
+            raise HTTPException(status_code=404, detail="API endpoint not found")
+        
+        # Check if it's a specific file in public
+        file_path = os.path.join(public_path, full_path)
+        if os.path.exists(file_path) and os.path.isfile(file_path):
+            return FileResponse(file_path)
+        
+        # Return index.html for all other routes to support React routing
+        index_path = os.path.join(public_path, "index.html")
+        if os.path.exists(index_path):
+            return FileResponse(index_path)
+        
+        return {"error": "Frontend not built. Run 'npm run build' first."}
+
 if __name__ == "__main__":
     import uvicorn
+    # In production, use uvicorn Backend.main:app
     uvicorn.run(app, host="0.0.0.0", port=8000)
