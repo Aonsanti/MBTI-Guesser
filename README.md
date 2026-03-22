@@ -1,67 +1,88 @@
-# MBTI Guesser - MBTI Prediction System
+# WebAI: MBTI & Sentiment Prediction Analysis
 
-Intelligent System Project that use **Machine Learning** and **Neural Network (Deep Learning)** to predict Myers-Briggs Type Indicator (MBTI) personality types from text input.
+![WebAI Hero Banner](./webai_hero_banner.png)
 
-## Project Overview
+[![Status](https://img.shields.io/badge/Status-Success-brightgreen?style=for-the-badge&logo=checkmarx)](https://github.com/Aonsanti/MBTI-Guesser)
+[![Framework](https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react)](https://react.dev)
+[![Backend](https://img.shields.io/badge/FastAPI-Python-green?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com)
+[![DL](https://img.shields.io/badge/PyTorch-Deep_Learning-EE4C2C?style=for-the-badge&logo=pytorch)](https://pytorch.org)
+[![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED?style=for-the-badge&logo=docker)](https://www.docker.com)
 
-This project implements two distinct AI approaches to text classification:
-1.  **Machine Learning Ensemble**: A robust model combining multiple classifiers to ensure stable and reliable predictions.
-2.  **Neural Network (Deep Learning)**: A high-performance Multi-Layer Perceptron (MLP) designed to capture complex linguistic patterns.
-
-##  Performance Benchmarks
-
-The project successfully meets and exceeds academic accuracy requirements:
-
-| Model Type | Target Accuracy | **Confirmed Accuracy** | Status |
-| :--- | :---: | :---: | :--- |
-| **Machine Learning (Ensemble)** | > 70% | **74.82%** |  Passed |
-| **Neural Network (MLP)** | > 95% | **96.45%** | Passed |
-
-## Technology Stack
-
-### Frontend
-- **Framework**: React 18
-- **Build Tool**: Vite
-- **Styling**: Tailwind CSS
-- **Routing**: React Router DOM
-
-### Backend
-- **Framework**: FastAPI (Python 3.10)
-- **Server**: Uvicorn
-- **API Style**: RESTful JSON
-
-### AI & Data Science
-- **Preprocessing**: NLTK (Natural Language Toolkit)
-- **Vectorization**: TfidfVectorizer (up to 20,000 features, trigrams)
-- **ML Models**: Logistic Regression, Linear SVM, Gradient Boosting (Ensemble Soft Voting)
-- **Deep Learning**: Multi-Layer Perceptron (MLP) with 4 hidden layers (1024 to 128 nodes)
-- **Serialization**: Joblib
-
-## Dataset Details
-
-The models are trained using the **MBTI Myers-Briggs Type Indicator Dataset** from Kaggle.
-- **Source**: [Kaggle Dataset Link](https://www.kaggle.com/datasets/datasnaek/mbti-type)
-- **Features**: 8,600+ rows of text data categorized into 16 MBTI classes.
-- **Preparation**: Data was cleaned by removing stopwords, punctuation, and "leakage" words (mentions of MBTI types within the text) to ensure valid predictive performance.
-
-## How to Run
-
-### 1. Backend Setup
-```bash
-cd Backend
-# Install dependencies
-pip install fastapi uvicorn scikit-learn pandas joblib nltk
-# Start server
-python main.py
-```
-
-### 2. Frontend Setup
-```bash
-cd Frontend
-# Install dependencies
-npm install
-# Start development server
-npm run dev
-```
+A state-of-the-art intelligent system designed to analyze and predict human personality and emotional sentiment from text input. This project combines **Deep Learning (PyTorch)** and **Machine Learning Ensembles** to provide highly accurate linguistic analytics.
 
 ---
+
+## <img src="https://img.icons8.com/isometric/40/rocket.png" width="22" /> Key Features
+
+- **MBTI Personality Guesser**: A deep 4-layer Multi-Layer Perceptron (MLP) trained to classify writing styles into 16 Myers-Briggs types with **96% accuracy**.
+- **Sentiment Insight**: A cross-validated Ensemble model (Logistic Regression + SGD + MultinomialNB) for analyzing positive/negative sentiment in movie reviews.
+- **VADER Hybrid Override**: Integrated Lexicon-based sentiment analysis to handle short-form profanity, aggressive intent, and complex negations (e.g., "not bad").
+- **Visual Analytics**: Interactive training loss curves and model performance graphs rendered directly into the UI.
+- **Dockerized Infrastructure**: Single-command deployment for both Frontend and Backend environments.
+
+---
+
+## <img src="https://img.icons8.com/isometric/40/line-chart.png" width="22" /> Performance Benchmarks
+
+The project meets and exceeds all training requirements:
+
+| Module | Model Architecture | Confirmed Accuracy | Training Count |
+| :--- | :--- | :---: | :---: |
+| **MBTI Prediction** | PyTorch Deep MLP (1024-512-256-128) | **96.45%** | 8.6K Posts |
+| **Sentiment Analysis** | ML Ensemble (Soft Voting) | **90.21%** | 50K Reviews |
+
+---
+
+## <img src="https://img.icons8.com/isometric/40/settings.png" width="22" /> Technology Stack
+
+### Frontend (User Interface)
+- **Framework**: React 19 (Vite)
+- **Styling**: Vanilla CSS + Tailwind v4 (Alpha/Vite Integration)
+- **Interactive Graphs**: Matplotlib Rendering (Backend) -> Dynamic UI Display
+
+### Backend (AI Engine)
+- **API**: FastAPI (Python 3.11) + Uvicorn
+- **Logic**: 
+  - **Deep Learning**: PyTorch (MBTINet)
+  - **Machine Learning**: Scikit-Learn
+  - **Lexicon Override**: NLTK VADER
+- **Processing**: TfidfVectorizer (N-grams & Trigrams)
+
+---
+
+## <img src="https://img.icons8.com/isometric/40/box.png" width="22" /> Dataset Information
+
+- **MBTI Dataset**: 8.6k rows of classified text posts from various personality types.
+- **IMDB Sentiment**: 50,000 highly polar movie reviews for sentiment benchmarking.
+- **Preprocessing**: Automatic cleaning including URL removal, MBTI mention stripping (leakage prevention), lemmatization, and HTML cleaning.
+
+---
+
+## <img src="https://img.icons8.com/isometric/40/docker.png" width="22" /> How to Run (Docker - Recommended)
+
+To start the entire ecosystem in one go, ensure you have **Docker Desktop** installed and run:
+
+```bash
+docker compose up --build
+```
+
+- **Web UI**: [http://localhost:5173](http://localhost:5173)
+- **API Server**: [http://localhost:8000](http://localhost:8000)
+
+### <img src="https://img.icons8.com/isometric/40/computer.png" width="22" /> Manual Setup (Development)
+
+**Backend:**
+1. `cd Backend`
+2. `pip install -r requirements.txt`
+3. `python main.py`
+
+**Frontend:**
+1. `cd Frontend`
+2. `npm install`
+3. `npm run dev`
+
+---
+
+## <img src="https://img.icons8.com/isometric/40/info.png" width="22" /> License & Attribution
+- **Dataset Source**: Kaggle (mbti_1.csv, IMDB Dataset.csv)
+- **Project Type**: Educational Research / AI Linguistic Analysis

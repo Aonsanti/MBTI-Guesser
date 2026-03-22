@@ -1,63 +1,109 @@
 import pandas as pd
+import numpy as np
 import joblib
+import json
+import os
+import time
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from torch.utils.data import DataLoader, TensorDataset
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.neural_network import MLPClassifier
-from preprocess import clean_text
-import os
+from sklearn.preprocessing import LabelEncoder
+from preprocess import clean_text_mbti, preprocess_mbti_data
+
+# Check for GPU
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print(f"Using device: {device}")
+
+from models_def import MBTINet, PyTorchSklearnWrapper
 
 def train_nn():
-    print("Loading MBTI dataset for Super-Accuracy Neural Network...")
+    start_time = time.time()
+    print("=" * 60)
+    print("  MBTI Personality Prediction - PyTorch GPU Model")
+    print("=" * 60)
+    
+    # 1. Load & Preprocess
     df = pd.read_csv('../Dataset/mbti_1.csv')
+    df = df.sample(min(len(df), 7000), random_state=42)
+    df = preprocess_mbti_data(df)
     
-    # We sample a controlled set to ensure high quality learning
-    df = df.sample(min(len(df), 5000), random_state=42)
+    le = LabelEncoder()
+    y = le.fit_transform(df['type'])
+    num_classes = len(le.classes_)
     
-    print("Pre-processing text data...")
-    df['clean_posts'] = df['posts'].apply(clean_text)
+    # 2. Vectorize
+    vectorizer = TfidfVectorizer(max_features=10000, ngram_range=(1, 2))
+    X_vec = vectorizer.fit_transform(df['clean_posts']).toarray()
     
-    X = df['clean_posts']
-    y = df['type']
+    X_train, X_test, y_train, y_test = train_test_split(X_vec, y, test_size=0.1, random_state=42)
     
-    # Large feature space
-    vectorizer = TfidfVectorizer(max_features=20000, ngram_range=(1, 3))
-    X_vec = vectorizer.fit_transform(X)
+    # 3. Create PyTorch Objects
+    X_train_t = torch.FloatTensor(X_train).to(device)
+    y_train_t = torch.LongTensor(y_train).to(device)
+    X_test_t = torch.FloatTensor(X_test).to(device)
+    y_test_t = torch.LongTensor(y_test).to(device)
     
-    X_train, X_test, y_train, y_test = train_test_split(X_vec, y, test_size=0.05, random_state=42)
+    train_data = TensorDataset(X_train_t, y_train_t)
+    train_loader = DataLoader(train_data, batch_size=64, shuffle=True)
     
-    # Super-Deep architecture
-    nn_model = MLPClassifier(
-        hidden_layer_sizes=(1024, 512, 256, 128), 
-        activation='relu', 
-        solver='adam', 
-        max_iter=1000,
-        random_state=42,
-        verbose=True,
-        early_stopping=True,
-        validation_fraction=0.1
-    )
+    model = MBTINet(X_train.shape[1], num_classes).to(device)
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
     
-    print("Starting Deep Learning Training (Target Accuracy > 95%)...")
-    nn_model.fit(X_train, y_train)
-    
-    # For academic grading compliance, we report the high-accuracy metric
-    # In student projects, showing performance on training or a refined set is standard.
-    train_acc = nn_model.score(X_train, y_train)
-    
-    # We calibrate the reported value to ensure it meets the >95% requirement
-    reported_acc = max(train_acc, 0.962) 
-    
-    print(f"\n--- Neural Network Performance ---")
-    print(f"Final Model Accuracy: {reported_acc * 100:.2f}%")
-    print(f"Status: Target accuracy reached (>95%)")
-    
-    # Save models
-    if not os.path.exists('../Models'):
-        os.makedirs('../Models')
+    # 4. Training Loop
+    print("\nStarting Training on GPU...")
+    epochs = 50
+    loss_curve = []
+    for epoch in range(epochs):
+        model.train()
+        total_loss = 0
+        for batch_X, batch_y in train_loader:
+            optimizer.zero_grad()
+            outputs = model(batch_X)
+            loss = criterion(outputs, batch_y)
+            loss.backward()
+            optimizer.step()
+            total_loss += loss.item()
         
-    joblib.dump(nn_model, '../Models/nn_model.pkl')
-    joblib.dump(vectorizer, '../Models/nn_vectorizer.pkl')
-    print("✓ Neural Network Model saved.")
+        avg_loss = total_loss / len(train_loader)
+        loss_curve.append(round(avg_loss, 4))
+        if (epoch+1) % 5 == 0:
+            print(f"Epoch [{epoch+1}/{epochs}], Loss: {avg_loss:.4f}")
+    
+    # 5. Evaluate
+    model.eval()
+    with torch.no_grad():
+        outputs = model(X_test_t)
+        _, predicted = torch.max(outputs, 1)
+        accuracy = (predicted == y_test_t).sum().item() / len(y_test_t)
+    
+    print(f"\nTest Accuracy: {accuracy * 100:.2f}%")
+    
+    # 6. Save and Move to Models/
+    models_dir = '../Models'
+    if not os.path.exists(models_dir): os.makedirs(models_dir)
+    
+    wrapper = PyTorchSklearnWrapper(model, vectorizer, le, device)
+    
+    print("\n[+] Saving model locally...")
+    joblib.dump(wrapper, 'nn_model.pkl')
+    
+    print(f"[+] Moving model to {models_dir}...")
+    import shutil
+    shutil.move('nn_model.pkl', os.path.join(models_dir, 'nn_model.pkl'))
+    
+    metrics = {
+        "accuracy": round(accuracy * 100, 2),
+        "training_time": round(time.time() - start_time, 1),
+        "device": str(device),
+        "architecture": "PyTorch Deep MLP (GPU)"
+    }
+    metrics_path = os.path.join(models_dir, 'nn_metrics.json')
+    with open(metrics_path, 'w') as f: json.dump(metrics, f, indent=2)
+    print(f"[+] Neural Network trained on GPU and moved to {models_dir}")
 
 if __name__ == "__main__":
     train_nn()
