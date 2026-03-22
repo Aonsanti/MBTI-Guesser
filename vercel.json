@@ -1,15 +1,12 @@
 {
+  "version": 2,
   "builds": [
     {
       "src": "api/index.py",
       "use": "@vercel/python",
       "config": {
         "includeFiles": [
-          "Models/ml_model.pkl",
-          "Models/ml_vectorizer.pkl",
-          "Models/nn_model.pkl",
-          "Models/ml_metrics.json",
-          "Models/nn_metrics.json",
+          "Models/**",
           "Backend/**"
         ],
         "runtime": "python3.12"
@@ -30,7 +27,7 @@
     },
     {
       "source": "/(.*)",
-      "destination": "/index.html"
+      "destination": "/public/index.html"
     }
   ]
 }

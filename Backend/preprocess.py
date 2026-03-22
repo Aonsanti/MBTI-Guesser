@@ -1,14 +1,18 @@
 import re
 import nltk
-from nltk.corpus import stopwords
-from nltk.stem import WordNetLemmatizer
+import os
+import tempfile
+from functools import lru_cache
 from bs4 import BeautifulSoup
 from joblib import Parallel, delayed
-import os
 
-# Ensure nltk resources are available
+# --- Lazy Global Objects ---
+_lemmatizer = None
+_stop_words = None
+
+@lru_cache(None)
 def initialize_nltk():
-    import tempfile
+    """Initialize NLTK resources for serverless runtime (uses /tmp/ dir)."""
     # Vercel serverless has a read-only filesystem except for /tmp
     nltk_data_dir = os.path.join(tempfile.gettempdir(), 'nltk_data')
     os.makedirs(nltk_data_dir, exist_ok=True)
@@ -23,10 +27,17 @@ def initialize_nltk():
         nltk.data.find('corpora/wordnet')
     except (LookupError, AttributeError):
         nltk.download('wordnet', download_dir=nltk_data_dir)
+    
+    from nltk.corpus import stopwords
+    from nltk.stem import WordNetLemmatizer
+    
+    return WordNetLemmatizer(), set(stopwords.words('english'))
 
-initialize_nltk()
-lemmatizer = WordNetLemmatizer()
-stop_words = set(stopwords.words('english'))
+def get_nltk_resources():
+    """Thread-safe and efficient resource retrieval."""
+    return initialize_nltk()
+
+
 
 
 # ==================== IMDB Preprocessing (for ML model) ====================
@@ -54,6 +65,7 @@ def clean_text_imdb(text):
     keep_words = {'not', 'no', 'never', 'nor', 'neither', 'none', 'cannot', 'without', 'against'}
     
     # Tokenize and lemmatize
+    lemmatizer, stop_words = get_nltk_resources()
     words = text.split()
     cleaned_words = []
     for word in words:
@@ -107,6 +119,7 @@ def clean_text_mbti(text):
     for t in types:
         text = text.replace(t, '')
     # Tokenize and lemmatize
+    lemmatizer, stop_words = get_nltk_resources()
     words = text.split()
     words = [lemmatizer.lemmatize(word) for word in words if word not in stop_words and len(word) > 2]
     return " ".join(words)
