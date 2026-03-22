@@ -26,7 +26,7 @@ except LookupError:
         nltk.download('vader_lexicon', download_dir=nltk_data_dir)
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from preprocess import clean_text_imdb, clean_text_mbti
-from models_def import MBTINet, PyTorchSklearnWrapper
+from models_def import NumpySklearnWrapper
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
