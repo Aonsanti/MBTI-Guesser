@@ -1,10 +1,11 @@
-Dataset/
 .git/
 .vscode/
-Models/*.pkl
+# Keep Dataset for user request, but minimize Models folder
+Models/imdb_cleaned.pkl
+Models/imdb_tfidf_cache.pkl
+# Production models only
 !Models/ml_model.pkl
 !Models/ml_vectorizer.pkl
 !Models/nn_model.pkl
-!Models/nn_vectorizer.pkl
-Models/imdb_cleaned.pkl
-Models/imdb_tfidf_cache.pkl
+!Models/nn_metrics.json
+!Models/ml_metrics.json
