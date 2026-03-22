@@ -48,10 +48,10 @@ def train_ml():
     else:
         print("[*] Building TF-IDF vectors...")
         vectorizer = TfidfVectorizer(
-            max_features=15000,       # Slightly more features for better accuracy
-            ngram_range=(1, 2),       # Unigrams + bigrams
-            min_df=5,                 # Remove rare terms (noise reduction)
-            max_df=0.95,              # Remove too-common terms
+            max_features=50000,       # More features for better accuracy
+            ngram_range=(1, 3),       # Unigrams, bigrams, and trigrams
+            min_df=3,                 # Remove rare terms (noise reduction)
+            max_df=0.90,              # Remove too-common terms
             sublinear_tf=True,        # log(1+tf) scaling — proven better for text
         )
         X_vec = vectorizer.fit_transform(X)
@@ -70,7 +70,7 @@ def train_ml():
 
     # Model 1: Logistic Regression (fast & excellent for sparse TF-IDF)
     clf_lr = LogisticRegression(
-        C=5, max_iter=1000, solver='lbfgs', random_state=42
+        C=10, max_iter=1000, solver='lbfgs', random_state=42
     )
 
     # Model 2: SGDClassifier with modified_huber loss
@@ -89,7 +89,7 @@ def train_ml():
     # Model 3: Multinomial Naive Bayes
     # Lightning fast, natively designed for text counts/TF-IDF distribution
     # Synergizes incredibly well with linear models in ensembles
-    clf_nb = MultinomialNB(alpha=0.5)
+    clf_nb = MultinomialNB(alpha=0.1)
 
     # ── 4. Train each model individually (with timing) ───────────
     models = {
