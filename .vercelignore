@@ -1,0 +1,10 @@
+Dataset/
+.git/
+.vscode/
+Models/*.pkl
+!Models/ml_model.pkl
+!Models/ml_vectorizer.pkl
+!Models/nn_model.pkl
+!Models/nn_vectorizer.pkl
+Models/imdb_cleaned.pkl
+Models/imdb_tfidf_cache.pkl

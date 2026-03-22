@@ -8,14 +8,21 @@ import os
 
 # Ensure nltk resources are available
 def initialize_nltk():
+    import tempfile
+    # Vercel serverless has a read-only filesystem except for /tmp
+    nltk_data_dir = os.path.join(tempfile.gettempdir(), 'nltk_data')
+    os.makedirs(nltk_data_dir, exist_ok=True)
+    if nltk_data_dir not in nltk.data.path:
+        nltk.data.path.append(nltk_data_dir)
+        
     try:
         nltk.data.find('corpora/stopwords')
     except (LookupError, AttributeError):
-        nltk.download('stopwords')
+        nltk.download('stopwords', download_dir=nltk_data_dir)
     try:
         nltk.data.find('corpora/wordnet')
     except (LookupError, AttributeError):
-        nltk.download('wordnet')
+        nltk.download('wordnet', download_dir=nltk_data_dir)
 
 initialize_nltk()
 lemmatizer = WordNetLemmatizer()

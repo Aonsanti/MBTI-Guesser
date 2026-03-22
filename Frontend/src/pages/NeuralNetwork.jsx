@@ -8,7 +8,7 @@ export default function NeuralNetwork() {
     const [datasets, setDatasets] = useState([]);
     const [error, setError] = useState(null);
 
-    const API_URL = "http://localhost:8000";
+    const API_URL = import.meta.env.DEV ? "http://localhost:8000" : "";
 
     // MBTI demo prediction when backend is unavailable
     const demoPrediction = (inputText) => {

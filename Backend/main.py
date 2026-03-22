@@ -4,10 +4,16 @@ import joblib
 import json
 import os
 import nltk
+import tempfile
+nltk_data_dir = os.path.join(tempfile.gettempdir(), 'nltk_data')
+os.makedirs(nltk_data_dir, exist_ok=True)
+if nltk_data_dir not in nltk.data.path:
+    nltk.data.path.append(nltk_data_dir)
+
 try:
-    nltk.data.find('vader_lexicon')
+    nltk.data.find('sentiment/vader_lexicon.zip')
 except LookupError:
-    nltk.download('vader_lexicon')
+    nltk.download('vader_lexicon', download_dir=nltk_data_dir)
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from preprocess import clean_text_imdb, clean_text_mbti
 from models_def import MBTINet, PyTorchSklearnWrapper
@@ -84,13 +90,13 @@ load_models()
 class TextInput(BaseModel):
     text: str
 
-@app.get("/")
+@app.get("/api/")
 def read_root():
     return {"message": "ML (IMDB) & NN (MBTI) Prediction API is running"}
 
 # ==================== ML: IMDB Sentiment Analysis ====================
 
-@app.post("/predict/ml")
+@app.post("/api/predict/ml")
 async def predict_ml(input_data: TextInput):
     if ml_model is None or ml_vec is None:
         raise HTTPException(status_code=500, detail="ML model not loaded")
@@ -132,7 +138,7 @@ async def predict_ml(input_data: TextInput):
 
 # ==================== NN: MBTI Personality Prediction ====================
 
-@app.post("/predict/nn")
+@app.post("/api/predict/nn")
 async def predict_nn(input_data: TextInput):
     if nn_model is None or nn_vec is None:
         raise HTTPException(status_code=500, detail="NN model not loaded")
@@ -146,19 +152,19 @@ async def predict_nn(input_data: TextInput):
         "accuracy": f"{nn_metrics['accuracy']}%" if nn_metrics else "N/A"
     }
 
-@app.get("/metrics/ml")
+@app.get("/api/metrics/ml")
 def get_ml_metrics():
     if ml_metrics is None:
         raise HTTPException(status_code=404, detail="ML metrics not found")
     return ml_metrics
 
-@app.get("/metrics/nn")
+@app.get("/api/metrics/nn")
 def get_nn_metrics():
     if nn_metrics is None:
         raise HTTPException(status_code=404, detail="NN metrics not found")
     return nn_metrics
 
-@app.get("/dataset-info")
+@app.get("/api/dataset-info")
 def get_dataset_info():
     return {
         "ml_dataset": {
