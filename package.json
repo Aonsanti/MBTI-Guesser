@@ -4,7 +4,7 @@
   "scripts": {
     "frontend-install": "npm install --prefix Frontend",
     "frontend-build": "npm run build --prefix Frontend",
-    "build": "npm run frontend-install && npm run frontend-build"
+    "build": "npm run frontend-install && npm run frontend-build && mv dist public"
   },
   "devDependencies": {
     "tailwindcss": "latest"
