@@ -115,7 +115,16 @@ async def predict_ml(input_data: TextInput):
     try:
         model, vec = ModelCache.get_ml_model()
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Model loading error: {str(e)}")
+        import traceback
+        error_info = {
+            "error_type": type(e).__name__,
+            "error_msg": str(e),
+            "cwd": os.getcwd(),
+            "models_path": MODELS_PATH,
+            "models_path_exists": os.path.exists(MODELS_PATH),
+            "traceback": traceback.format_exc()
+        }
+        raise HTTPException(status_code=500, detail=f"Model loading error: {error_info}")
     
     cleaned = clean_text_imdb(input_data.text)
     transformed = vec.transform([cleaned])
