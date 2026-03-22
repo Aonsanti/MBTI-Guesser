@@ -13,7 +13,7 @@ A state-of-the-art intelligent system designed to analyze and predict human pers
 
 - **MBTI Personality Guesser**: A deep 4-layer Multi-Layer Perceptron (MLP) trained to classify writing styles into 16 Myers-Briggs types with **96% accuracy**.
 - **Sentiment Insight**: A cross-validated Ensemble model (Logistic Regression + SGD + MultinomialNB) for analyzing positive/negative sentiment in movie reviews.
-- **VADER Hybrid Override**: Integrated Lexicon-based sentiment analysis to handle short-form profanity, aggressive intent, and complex negations (e.g., "not bad").
+- **VADER Hybrid Override**: Integrated Lexicon-based sentiment analysis to handle short-form profanity, aggressive intent, and complex negations.
 - **Visual Analytics**: Interactive training loss curves and model performance graphs rendered directly into the UI.
 - **Dockerized Infrastructure**: Single-command deployment for both Frontend and Backend environments.
 
