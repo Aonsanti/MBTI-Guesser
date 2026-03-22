@@ -44,7 +44,6 @@ The project meets and exceeds all training requirements:
 
 - **MBTI Dataset**: 8.6k rows of classified text posts from various personality types.
 - **IMDB Sentiment**: 50,000 highly polar movie reviews for sentiment benchmarking.
-- **Preprocessing**: Automatic cleaning including URL removal, MBTI mention stripping (leakage prevention), lemmatization, and HTML cleaning.
 
 ---
 
@@ -70,8 +69,5 @@ docker compose up --build
 ---
 
 - **Dataset Source**: Kaggle (mbti_1.csv, IMDB Dataset.csv)
-- **link Dataset**:
 - Kaggle MBTI -> https://www.kaggle.com/datasets/datasnaek/mbti-type
 - Kaggle IMDB -> https://www.kaggle.com/code/lakshmi25npathi/sentiment-analysis-of-imdb-movie-reviews
-- 
-- **Project Type**: Educational Research / AI Linguistic Analysis
